@@ -1,0 +1,22 @@
+COMANDO: adk api_server
+
+CRIAR SESSÃO: 
+	- url: http://127.0.0.1:8000/apps/agent/users/u_scredito_web/sessions/s_scredito_web
+
+ENVIAR MENSAGEM:
+	- url: http://127.0.0.1:8000/run
+	- body: 
+{
+  "appName": "agent",
+  "userId": "u_scredito_web",
+  "sessionId": "s_scredito_web",
+  "newMessage": {
+    "role": "user",
+    "parts": [{
+      "text": "{\"nome\": \"Juliana Souza\", \"telefone\": \"21987654321\", \"email\": \"juliana.souza@exemplo.com\", \"idade\": 28, \"cidade\": \"Rio de Janeiro\", \"negocio\": \"Loja de moda e vestuário online\", \"valor\": 1, \"renda_familiar\": 5500, \"escolaridade\": 3}"
+    }]
+  }
+}
+
+RODANDO NO DEBIAN:
+ 	executar antes: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libgdk-pixbuf-2.0-0

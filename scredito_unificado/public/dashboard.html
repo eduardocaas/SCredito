@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard PDFs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 900px;
+        }
+
+        .table-hover tbody tr:hover {
+            cursor: pointer;
+            background-color: #e9ecef;
+        }
+
+        .icon-action {
+            color: #0d6efd;
+            font-size: 1.3rem;
+            text-decoration: none; /* Remove sublinhado do link */
+        }
+        
+        .icon-action.disabled {
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+        }
+
+        .btn-back {
+            font-size: 1.2rem;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .filter-group label {
+            margin-bottom: 0;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .filter-group .form-select {
+            width: 180px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="/" class="btn btn-light btn-back" title="Voltar para a página inicial"><i
+                    class="bi bi-arrow-left"></i></a>
+            <h1 class="mb-0">📑 PDFs - Análise de Crédito</h1>
+            <div></div>
+        </div>
+
+        <div class="header-controls">
+            <div class="filter-group">
+                <label for="statusFilter">Filtrar por status:</label>
+                <select class="form-select" id="statusFilter">
+                    <option value="all" selected>Todos</option>
+                    <option value="unread">Não Lidos</option>
+                    <option value="read">Lidos</option>
+                </select>
+            </div>
+
+            <button id="refreshButton" class="btn btn-primary">
+                <i class="bi bi-arrow-clockwise"></i> Atualizar Lista
+            </button>
+        </div>
+
+        <div id="alert-placeholder"></div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Nome do Arquivo</th>
+                                <th scope="col" class="text-center" style="width: 120px;">Status</th>
+                                <th scope="col" class="text-center" style="width: 100px;">Visualizar</th>
+                                <th scope="col" class="text-center" style="width: 100px;">Cadastrar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pdf-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-files-message" class="text-center p-4 d-none">
+                    <p class="text-muted fs-5">Pasta de PDFs está vazia ou não foi encontrada.</p>
+                </div>
+            </div>
+        </div>
+        <footer class="text-center text-muted mt-4">
+            <hr>
+            <p>🤖 Powered by Google ADK</p>
+        </footer>
+    </div>
+
+    <script>
+    const PORT = 3000;
+
+    const tableBody = document.getElementById('pdf-table-body');
+    const refreshButton = document.getElementById('refreshButton');
+    const alertPlaceholder = document.getElementById('alert-placeholder');
+    const noFilesMessage = document.getElementById('no-files-message');
+    const statusFilter = document.getElementById('statusFilter');
+
+    const showAlert = (message, type = 'danger') => {
+        alertPlaceholder.innerHTML = '';
+        const wrapper = document.createElement('div');
+        let actionContent = '';
+        if (message.includes('Não foi possível acessar a pasta de PDFs')) {
+            actionContent = `<button id="createFolderBtn" class="btn btn-sm btn-outline-danger ms-3">Criar Pasta</button>`;
+        }
+        wrapper.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+            <span>${message}</span>
+            <div class="d-flex align-items-center">
+                ${actionContent}
+                <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>`;
+        alertPlaceholder.append(wrapper);
+        if (actionContent) {
+            document.getElementById('createFolderBtn').addEventListener('click', createPdfFolder);
+        }
+    };
+
+    const createPdfFolder = async () => { /* ... (esta função não muda) ... */ };
+
+    const fetchPdfFiles = async () => {
+        const selectedStatus = statusFilter.value;
+        const url = `http://localhost:${PORT}/api/files?status=${selectedStatus}`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erro de servidor desconhecido.');
+            }
+            const files = await response.json();
+            alertPlaceholder.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            if (files.length === 0) {
+                noFilesMessage.classList.remove('d-none');
+                noFilesMessage.querySelector('p').textContent = selectedStatus !== 'all' ? 'Nenhum arquivo encontrado para este filtro.' : 'Pasta de PDFs está vazia ou não foi encontrada.';
+            } else {
+                noFilesMessage.classList.add('d-none');
+                files.forEach(file => {
+                    const row = document.createElement('tr');
+                    const statusBadge = file.isRead ?
+                        `<span class="badge bg-success">Lido</span>` :
+                        `<span class="badge bg-warning text-dark">Não Lido</span>`;
+
+                    row.innerHTML = `
+                        <td>${file.displayName}</td>
+                        <td class="text-center">${statusBadge}</td>
+                        <td class="text-center">
+                            <i class="bi bi-eye-fill icon-action" title="Visualizar PDF" data-filename="${file.originalName}" style="cursor: pointer;"></i>
+                        </td>
+                        <td class="text-center">
+                            <i class="bi bi-pencil-square icon-action" title="Cadastrar a partir do PDF" data-filename="${file.originalName}" style="cursor: pointer;"></i>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        } catch (error) {
+            console.error('Falha ao buscar arquivos:', error);
+            showAlert(`<strong>Erro ao carregar arquivos:</strong> ${error.message}`);
+            noFilesMessage.classList.remove('d-none');
+            tableBody.innerHTML = '';
+        }
+    };
+
+    const openFile = async (filename) => {
+        try {
+            const response = await fetch(`http://localhost:${3000}/api/open`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Não foi possível processar o arquivo.');
+            }
+            setTimeout(fetchPdfFiles, 500);
+        } catch (error) {
+            console.error('Falha ao processar arquivo:', error);
+            showAlert(`<strong>Erro:</strong> ${error.message}`);
+        }
+    };
+
+    //  preparar e ir para a tela de cadastro
+    const registerFromFile = async (filename) => {
+        try {
+            const response = await fetch(`http://localhost:${PORT}/api/prepare-for-register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.error || 'Não foi possível preparar o arquivo para cadastro.');
+            }
+
+            // Redireciona para a página de formulário com o nome FINAL do arquivo
+            window.location.href = `formulario-com-pdf.html?pdf=${result.finalName}`;
+
+        } catch (error) {
+            console.error('Falha ao preparar para cadastro:', error);
+            showAlert(`<strong>Erro:</strong> ${error.message}`);
+        }
+    };
+
+    // DELEGADOR DE EVENTOS ATUALIZADO
+    tableBody.addEventListener('click', (event) => {
+        const targetIcon = event.target;
+        const filename = targetIcon.getAttribute('data-filename');
+
+        if (!filename) return;
+
+        // Se clicou no ícone de VISUALIZAR
+        if (targetIcon.classList.contains('bi-eye-fill')) {
+            openFile(filename);
+        }
+
+        // Se clicou no ícone de CADASTRAR
+        if (targetIcon.classList.contains('bi-pencil-square')) {
+            registerFromFile(filename);
+        }
+    });
+
+    statusFilter.addEventListener('change', fetchPdfFiles);
+    refreshButton.addEventListener('click', fetchPdfFiles);
+    document.addEventListener('DOMContentLoaded', fetchPdfFiles);
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

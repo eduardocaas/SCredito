@@ -1,0 +1,2 @@
+pip install Flask scikit-learn pandas joblib
+pip freeze > requirements.txt

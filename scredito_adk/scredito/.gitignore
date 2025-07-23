@@ -1,0 +1,10 @@
+__pycache__
+agente_analista/__pycache__
+agente_dashboard/__pycache__
+agente_pdf/__pycache__
+venv
+
+.env 
+agente_analista/.env
+agente_dashboard/.env
+agente_pdf/.env
