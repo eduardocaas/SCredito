@@ -18,6 +18,8 @@ pip install -r requirements.txt
 
 cls
 
+START "Website (UI)" iniciar_site.bat
+
 echo.
 echo [OK] - Subindo servidor do ADK na porta 8000... 
 adk api_server --allow_origins="*"

@@ -14,6 +14,9 @@ CALL npm install
 
 cls
 
+echo Subindo servidor, aguarde...
+timeout /t 15 /nobreak
+
 echo.
 echo [OK] - Subindo servidor da UI na porta 3001... 
 node server.js
