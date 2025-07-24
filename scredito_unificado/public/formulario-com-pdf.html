@@ -132,29 +132,21 @@
             const pdfFilename = urlParams.get('pdf');
 
             if (pdfFilename) {
-                // 2. Monta a URL completa para a nossa API
+                // 2. Monta a URL completa para a API
                 const pdfUrl = `http://localhost:3000/api/pdfs/${pdfFilename}`;
                 
                 // 3. Define o atributo 'src' do visualizador de PDF
                 pdfViewer.src = pdfUrl;
             } else {
-                // Caso alguém acesse a página sem um PDF
                 console.error('Nenhum arquivo PDF foi especificado na URL.');
                 document.querySelector('.pdf-viewer-container').innerHTML = 
                     `<div class="alert alert-danger h-100 d-flex align-items-center justify-content-center">
                         Erro: Nenhum PDF selecionado. Por favor, volte à lista e escolha um arquivo.
                     </div>`;
             }
-
-            // Lógica para o formulário (a ser implementada)
-            const clienteForm = document.getElementById('clienteForm');
-            clienteForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                alert('Formulário enviado! (A lógica de salvamento ainda precisa ser criada)');
-                // Aqui você implementaria a lógica para salvar os dados do formulário
-            });
         });
     </script>
+    <script src="script_form.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
