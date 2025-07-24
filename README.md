@@ -20,7 +20,8 @@ Com foco no cliente, foi proposto e implementado o **Steve Crédito**, um chatbo
 Com foco na empresa, foi implementado um sistema de análise de crédito para novos clientes, com o uso do poderio da nova ferramenta **Google ADK** foi desenvolvido um sistema multiagente para análisar novos clientes mediante solicitação de crédito no website da empresa. Os agentes de IA tem como objetivo reduzir o tempo de decisão do analista humano, mantendo a precisão, para atingir as metas de negócio da SCredito.
 
 ## ℹ️ Funcionamento
-> ### A documentação referente ao deploy e execução dos serviços está localizada em README_SCRIPTS.md na raiz do projeto.
+> * ### A documentação referente ao deploy e execução dos serviços está localizada em [README_SCRIPTS.md](https://github.com/eduardocaas/SCredito/blob/main/README_SCRIPTS.md).
+> * ### A demonstração do funcionamento do projeto pode ser localizada em [README_DEMO.md](https://github.com/eduardocaas/SCredito/blob/main/README_DEMO.md).
 $~$
 
 ## Tecnologias utilizadas
@@ -48,11 +49,17 @@ Foi reutilizado o site da SCredito e municiado com um chatbot LLM, o **Steve Cr�
 ---
 
 ### Análise de novos clientes com Google ADK
-> Localização: **scredito_adk**
+> Localização: **scredito_adk/scredito**
 
 Sistema multiagente de IA para análise de crédito de novos clientes utilizando o Google ADK. Foi desenvolvido em ambiente Python e SO Windows. O sistema roda em uma API do ADK.
 
 Tem como objetivo realizar de forma sequencial uma análise de crédito, recebendo dados em JSON do website da SCrédito, e realizando uma análise sobre a proposta de negócio, perfil do cliente, renda, idade, etc.. E monta um PDF com insights, trazendo maior facilidade para o analista humano.
+
+> 🔎 **Para mais informações sobre os agentes, explore os prompts nos respectivos diretórios citados abaixo:** 
+> 1. agent.py
+> 2. agente_analista/agent.py
+> 3. agente_dashboard/agent.py
+> 4. agente_pdf/agent.py
 
 #### Agentes
 * Orquestrador: Recebe os dados de entrada e invoca sequencialmente os agentes a seguir.
@@ -136,5 +143,3 @@ O projeto do assistente financeiro via IA e análise de crédito por IA, irá ag
 * Agilidade: Acelerar a análise de crédito para novos clientes, reduzindo o tempo de decisão e
 mantendo a precisão, para atingir as metas de negócio da SCredito.
 * Retenção: Um serviço disponível 24/7, fortalece o relacionamento e ajuda a superar a meta de retenção de clientes de 80%.
-
----
